@@ -40,7 +40,9 @@ func (r *Reader) Uint8(n uint) (uint8, error) {
 	var vl uint8
 	for n > 0 {
 		if r.n == 0 {
-			r.nextByte()
+			if err := r.nextByte(); err != nil {
+				return 0, err
+			}
 		}
 
 		m := r.n
