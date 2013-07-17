@@ -1,4 +1,4 @@
-bits
+bit
 ======
 
 This package provides a simple bit reader that returns different
