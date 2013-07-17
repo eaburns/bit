@@ -7,13 +7,6 @@ import (
 	"io"
 )
 
-// Reader provides methods for reading bits.
-type Reader struct {
-	in io.Reader
-	b  uint8
-	n  uint
-}
-
 var mask = [...]uint8{
 	0x0,
 	0x1,
@@ -24,6 +17,13 @@ var mask = [...]uint8{
 	0x3F,
 	0x7F,
 	0xFF,
+}
+
+// Reader provides methods for reading bits.
+type Reader struct {
+	in io.Reader
+	b  uint8
+	n  uint
 }
 
 // NewReader returns a new Reader that reads bits the given io.Reader.
