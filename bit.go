@@ -10,11 +10,11 @@ import (
 // Reader provides methods for reading bits.
 type Reader struct {
 	in io.Reader
-	b uint8
-	n uint
+	b  uint8
+	n  uint
 }
 
-var mask = [9]uint8 {
+var mask = [9]uint8{
 	0x0,
 	0x1,
 	0x3,
@@ -28,7 +28,7 @@ var mask = [9]uint8 {
 
 // NewReader returns a new Reader that reads bits the given io.Reader.
 func NewReader(r io.Reader) *Reader {
-	return &Reader{ in: r }
+	return &Reader{in: r}
 }
 
 // Uint8 reads and return n bits, up to 8.  It panicks if n is greater than 8.
