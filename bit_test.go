@@ -1,6 +1,6 @@
 // © 2013 the Bits Authors under the MIT license. See AUTHORS for the list of authors.
 
-package bits
+package bit
 
 import (
 	"bytes"

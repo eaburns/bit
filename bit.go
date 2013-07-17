@@ -1,7 +1,7 @@
 // © 2013 the Bits Authors under the MIT license. See AUTHORS for the list of authors.
 
-// Package bits implements functionality for reading streams of bits from an io.Reader.
-package bits
+// Package bit implements functionality for reading streams of bits from an io.Reader.
+package bit
 
 import (
 	"io"
