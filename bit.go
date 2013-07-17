@@ -14,7 +14,7 @@ type Reader struct {
 	n  uint
 }
 
-var mask = [9]uint8{
+var mask = [...]uint8{
 	0x0,
 	0x1,
 	0x3,
