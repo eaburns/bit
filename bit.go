@@ -8,6 +8,7 @@ import (
 )
 
 // Reader provides methods for reading bits.
+// Reader buffers bits up to the next byte boundary.
 type Reader struct {
 	in io.Reader
 	b  uint64
