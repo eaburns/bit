@@ -74,6 +74,9 @@ func buffer(r io.Reader, n uint) (uint64, uint, error) {
 
 	var buf [8]uint8
 	if _, err := io.ReadFull(r, buf[:bytes]); err != nil {
+		if err == io.EOF {
+			err = io.ErrUnexpectedEOF
+		}
 		return 0, 0, err
 	}
 
