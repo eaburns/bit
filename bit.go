@@ -85,3 +85,23 @@ func buffer(r io.Reader, n uint) (uint64, uint, error) {
 func mask(i uint) uint64 {
 	return ^uint64(0) >> (64 - i)
 }
+
+// ReadFields performs a series of reads of differing numbers of bits, specified by the argument
+// list.  If no error occurs, then the results of the reads are returned in a slice, otherwise the
+// first encountered error is returned.   If the error is EOF and any number of bits has been
+// beer read then io.ErrUnexpectedEOF is returned, if the error is EOF and nothing was read
+// then io.EOF is returned.  If any of the read sizes specified by the argument are greater than
+// 64 then ReadFields panicks.
+func (r *Reader) ReadFields(ns ...uint) ([]uint64, error) {
+	fs := make([]uint64, len(ns))
+	var err error
+	for i, n := range ns {
+		switch fs[i], err = r.Read(n); {
+		case err == io.EOF && i != 0:
+			return nil, io.ErrUnexpectedEOF
+		case err != nil:
+			return nil, err
+		}
+	}
+	return fs, nil
+}
