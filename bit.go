@@ -10,10 +10,9 @@ import (
 // Reader provides methods for reading bits.
 // Reader buffers bits up to the next byte boundary.
 type Reader struct {
-	in  io.Reader
-	b   uint64
-	n   uint
-	err error
+	in io.Reader
+	b  uint64
+	n  uint
 }
 
 // NewReader returns a new Reader that reads bits the given io.Reader.
@@ -21,19 +20,8 @@ func NewReader(r io.Reader) *Reader {
 	return &Reader{in: r}
 }
 
-// Err returns the first error encountered.
-func (r *Reader) Err() error {
-	return r.err
-}
-
 // Read returns the next n bits, up to 64.  It panicks if n is greater than 64.
-// If an error is encountered, or if an error was encountered during a previous call
-// to Read, then 0 is returned and the first error can be retrieved by Err().
-func (r *Reader) Read(n uint) uint64 {
-	if r.err != nil {
-		return 0
-	}
-
+func (r *Reader) Read(n uint) (uint64, error) {
 	if n > 64 {
 		panic("Attempt to read too many bits")
 	}
@@ -41,8 +29,9 @@ func (r *Reader) Read(n uint) uint64 {
 	var vl uint64
 	for n > 0 {
 		if r.n == 0 {
-			if r.b, r.n, r.err = buffer(r.in, n); r.err != nil {
-				return 0
+			var err error
+			if r.b, r.n, err = buffer(r.in, n); err != nil {
+				return 0, err
 			}
 		}
 
@@ -59,7 +48,7 @@ func (r *Reader) Read(n uint) uint64 {
 		r.n -= m
 	}
 
-	return vl
+	return vl, nil
 }
 
 func buffer(r io.Reader, n uint) (uint64, uint, error) {

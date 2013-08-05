@@ -74,9 +74,9 @@ func TestRead(t *testing.T) {
 			panic("Number of reads does not match number of results")
 		}
 		for i, n := range test.ns {
-			m := r.Read(n)
-			if r.Err() != nil {
-				panic("Unexpected error: " + r.Err().Error())
+			m, err := r.Read(n)
+			if err != nil {
+				panic("Unexpected error: " + err.Error())
 			}
 			if m != test.vals[i] {
 				t.Errorf("%v with reads %v: read %d gave %x, expected %x\n", test.data, test.ns, i, m, test.vals[i])
