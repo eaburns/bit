@@ -21,30 +21,37 @@ func NewReader(r io.Reader) *Reader {
 }
 
 // Read returns the next n bits, up to 64.  It panicks if n is greater than 64.
+// If an EOF is encountered and some bits have been read then io.ErrUnexpectedEOF
+// is returned, otherwise if an EOF is encountered and nothing was read then io.EOF
+// is returned.
 func (r *Reader) Read(n uint) (uint64, error) {
 	if n > 64 {
 		panic("Attempt to read too many bits")
 	}
 
 	var vl uint64
-	for n > 0 {
+	left := n
+	for left > 0 {
 		if r.n == 0 {
 			var err error
-			if r.b, r.n, err = buffer(r.in, n); err != nil {
+			switch r.b, r.n, err = buffer(r.in, left); {
+			case err == io.EOF && left != n:
+				return 0, io.ErrUnexpectedEOF
+			case err != nil:
 				return 0, err
 			}
 		}
 
 		m := r.n
-		if r.n >= n {
-			m = n
+		if r.n >= left {
+			m = left
 		}
 
 		shift := r.n - m
 		b := (r.b >> shift) & mask(m)
 		vl = (vl << m) | b
 
-		n -= m
+		left -= m
 		r.n -= m
 	}
 
@@ -63,9 +70,6 @@ func buffer(r io.Reader, n uint) (uint64, uint, error) {
 
 	var buf [8]uint8
 	if _, err := io.ReadFull(r, buf[:bytes]); err != nil {
-		if err == io.EOF {
-			err = io.ErrUnexpectedEOF
-		}
 		return 0, 0, err
 	}
 
