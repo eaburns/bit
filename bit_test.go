@@ -1,10 +1,15 @@
 // © 2013 the Bits Authors under the MIT license. See AUTHORS for the list of authors.
+//
+// Some benchmark functions in this file were adapted from github.com/bamiaux/iobit
+// which came with the following copyright notice:
+// Copyright 2013 Benoît Amiaux. All rights reserved.
 
 package bit
 
 import (
 	"bytes"
 	"io"
+	"math/rand"
 	"testing"
 )
 
@@ -213,4 +218,62 @@ func TestReadFieldsEOF(t *testing.T) {
 		}
 	}
 
+}
+
+func BenchmarkReadAlign1(b *testing.B) {
+	benchmarkReads(b, 64, 1)
+}
+
+func BenchmarkReadAlign32(b *testing.B) {
+	benchmarkReads(b, 64, 32)
+}
+
+func BenchmarkReadAlign64(b *testing.B) {
+	benchmarkReads(b, 64, 64)
+}
+
+func benchmarkReads(b *testing.B, chunk, align int) {
+	size := 1 << 12
+	buf, bits, _, last := prepareBenchmark(size, chunk, align)
+	b.SetBytes(int64(len(buf)))
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		r := NewReader(bytes.NewReader(buf))
+		for j := 0; j < last; j++ {
+			r.Read(bits[j])
+		}
+	}
+}
+
+func prepareBenchmark(size, chunk, align int) ([]byte, []uint, []uint64, int) {
+	buf := make([]byte, size)
+	bits := make([]uint, size)
+	values := make([]uint64, size)
+	idx := 0
+	last := 0
+	for i := 0; i < size; i++ {
+		val := getNumBits(idx, size*8, chunk, align)
+		idx += val
+		if val != 0 {
+			last = i + 1
+		}
+		bits[i] = uint(val)
+		values[i] = uint64(rand.Uint32())<<32 + uint64(rand.Uint32())
+	}
+	return buf, bits, values, last
+}
+
+func getNumBits(read, max, chunk, align int) int {
+	bits := 1
+	if align != chunk {
+		bits += rand.Intn(chunk / align)
+	}
+	bits *= align
+	if read+bits > max {
+		bits = max - read
+	}
+	if bits > chunk {
+		panic("too many bits")
+	}
+	return bits
 }
