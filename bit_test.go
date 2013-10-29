@@ -85,8 +85,7 @@ func TestRead(t *testing.T) {
 				panic("Unexpected error: " + err.Error())
 			}
 			if m != test.vals[i] {
-				t.Errorf("%v with reads %v: read %d gave %x, expected %x\n", test.data, test.ns, i, m, test.vals[i])
-				break
+				t.Errorf("%v with reads %v: read %d gave %x, expected %x", test.data, test.ns, i, m, test.vals[i])
 			}
 		}
 	}
@@ -188,7 +187,6 @@ func TestReadFields(t *testing.T) {
 		for i := range fs {
 			if fs[i] != test.fs[i] {
 				t.Errorf("Reading Fields %v from %v, expected %v, got %v", test.ns, test.data, test.ns, fs)
-				break
 			}
 		}
 	}
